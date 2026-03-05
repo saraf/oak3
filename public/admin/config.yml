@@ -1,0 +1,60 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: public/images
+public_folder: /images
+
+# Use Netlify Identity for authentication
+publish_mode: editorial_workflow
+
+collections:
+
+  # ── BLOG ARTICLES ──────────────────────────────────────────────────────────
+  - name: articles
+    label: Blog Articles
+    folder: src/content/articles
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title,      name: title,      widget: string }
+      - { label: Date,       name: date,       widget: string,   hint: "e.g. Mar 01, 2025" }
+      - { label: Category,   name: category,   widget: select,
+          options: [Seasonal Wellness, Daily Routine, Herbs & Oils, Doshas, Recipes, Lifestyle] }
+      - { label: Excerpt,    name: excerpt,    widget: text,     hint: "One-sentence summary shown on the blog listing page." }
+      - { label: Symbol,     name: symbol,     widget: string,   default: "🌿", hint: "Emoji shown on the blog card." }
+      - { label: Background, name: bgGradient, widget: string,
+          default: "linear-gradient(135deg, #1c3526, #3d6b50)",
+          hint: "CSS gradient for the card image, e.g. linear-gradient(135deg, #1c3526, #3d6b50)" }
+      - { label: Body,       name: body,       widget: markdown }
+
+  # ── NEWS ───────────────────────────────────────────────────────────────────
+  - name: news
+    label: News Items
+    folder: src/content/news
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Date,  name: date,  widget: string, hint: "Format: YYYY.MM.DD e.g. 2025.03.01" }
+      - { label: Tag,   name: tag,   widget: select, options: [news, seminar, blog] }
+      - { label: Title, name: title, widget: string }
+      - { label: Link,  name: href,  widget: string, required: false,
+          hint: "Optional internal link e.g. /seminars or /blog/spring-detox" }
+
+  # ── SEMINARS ───────────────────────────────────────────────────────────────
+  - name: seminars
+    label: Seminars
+    folder: src/content/seminars
+    create: true
+    slug: "{{slug}}"
+    extension: json
+    fields:
+      - { label: Date,     name: date,     widget: string, hint: "e.g. Apr 12, 2025" }
+      - { label: Title,    name: title,    widget: string }
+      - { label: Format,   name: format,   widget: string, hint: "e.g. In-person · Osaka  or  Online" }
+      - { label: Capacity, name: capacity, widget: string, hint: "e.g. 12 seats" }
+      - { label: Status,   name: status,   widget: select, options: [open, soon, full] }
