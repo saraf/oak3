@@ -1,4 +1,4 @@
 ---
-// Redirect root to /news (the home dashboard)
-return Astro.redirect('/news');
 ---
+<meta http-equiv="refresh" content="0; url=/news" />
+<script>window.location.href = '/news'</script>
