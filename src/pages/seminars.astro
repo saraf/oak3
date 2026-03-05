@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Banner from '../components/Banner.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { getCollection } from 'astro:content';
+
+const seminars = await getCollection('seminars');
+---
+
+<BaseLayout title="Seminars" description="Upcoming Ayurveda seminars in Osaka and online. Topics include detox, massage, herbs, skin rituals, and India study tours.">
+  <Banner
+    title="Upcoming"
+    titleEm="Seminars"
+    subtitle="Osaka · Online · India"
+  />
+
+  <section class="bg-white">
+    <SectionHeader title="Upcoming Seminars" jp="セミナー案内" />
+    <table class="seminar-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Title</th>
+          <th>Format</th>
+          <th>Capacity</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {seminars.map(s => (
+          <tr>
+            <td>{s.data.date}</td>
+            <td>{s.data.title}</td>
+            <td>{s.data.format}</td>
+            <td>{s.data.capacity}</td>
+            <td><span class={`status ${s.data.status}`}>{s.data.status}</span></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <p class="register-note">
+      To register for a seminar, please use the <a href="/contact">contact form</a> or send
+      an email. We will confirm your place within 2 business days.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .register-note {
+    margin-top: 20px;
+    font-size: 14.5px;
+    color: var(--text-light);
+  }
+  .register-note a { color: var(--green-mid); }
+</style>

@@ -1,0 +1,126 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Banner from '../components/Banner.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+---
+
+<BaseLayout
+  title="About Ayurveda"
+  description="Learn what Ayurveda is, the three doshas, and how this ancient Indian science applies to modern life."
+>
+  <Banner
+    title="About"
+    titleEm="Ayurveda"
+    subtitle="The ancient science of life"
+  />
+
+  <section class="bg-cream">
+    <SectionHeader title="What is Ayurveda?" jp="アーユルヴェーダとは" />
+    <div class="about-grid">
+      <div class="about-text">
+        <p>
+          Ayurveda is one of the world's oldest and most complete systems of natural medicine,
+          originating in ancient India over 5,000 years ago. The name itself unites two Sanskrit
+          words: <em>Ayus</em> (life) and <em>Veda</em> (knowledge) — meaning "the science of life."
+        </p>
+        <p>
+          Unlike modern medicine's focus on treating disease, Ayurveda sees health as a dynamic
+          harmony between body, mind, and spirit. It teaches us how to understand our unique
+          constitution — our <em>Prakriti</em> — and how to live in alignment with nature's rhythms
+          through food, herbs, daily routine, and seasonal practice.
+        </p>
+        <p>
+          At e-Ayurveda Osaka, we offer accessible, practical Ayurveda education grounded in
+          authentic tradition, adapted thoughtfully for modern life in Japan and around the world.
+        </p>
+        <p style="margin-top:20px;">
+          <a href="/courses" class="btn btn-primary">Explore Our Courses</a>
+          &nbsp;&nbsp;
+          <a href="/consultation" class="btn btn-outline">Book a Consultation</a>
+        </p>
+      </div>
+      <div class="doshas-card">
+        <h3>The Three Doshas</h3>
+        <ul>
+          <li>
+            <strong>Vata</strong> — Air &amp; Space. Governs movement, creativity, and the nervous
+            system. When balanced: energetic and adaptable.
+          </li>
+          <li>
+            <strong>Pitta</strong> — Fire &amp; Water. Governs digestion, metabolism, and
+            intelligence. When balanced: focused and purposeful.
+          </li>
+          <li>
+            <strong>Kapha</strong> — Earth &amp; Water. Governs structure, immunity, and stability.
+            When balanced: calm and nurturing.
+          </li>
+        </ul>
+        <p class="doshas-note">
+          Your unique combination of these three forces — your <em>Prakriti</em> — is determined
+          at birth and guides every Ayurvedic recommendation.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+    align-items: start;
+  }
+  .about-text p { margin-bottom: 16px; font-size: 16.5px; color: var(--text); }
+  .about-text p:first-child::first-letter {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 600;
+    color: var(--green-deep);
+    float: left;
+    line-height: 0.8;
+    margin: 4px 8px 0 0;
+  }
+  .doshas-card {
+    background: var(--green-deep);
+    color: var(--white);
+    padding: 28px 26px;
+    border-radius: 2px;
+  }
+  .doshas-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--gold-light);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(196,150,58,0.3);
+    letter-spacing: 1px;
+  }
+  .doshas-card ul { list-style: none; padding: 0; }
+  .doshas-card ul li {
+    font-size: 14.5px;
+    color: rgba(255,255,255,0.8);
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .doshas-card ul li::before {
+    content: '✦';
+    color: var(--gold);
+    font-size: 10px;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+  .doshas-note {
+    margin-top: 18px;
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.6;
+  }
+  @media (max-width: 820px) {
+    .about-grid { grid-template-columns: 1fr; }
+  }
+</style>

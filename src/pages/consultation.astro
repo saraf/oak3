@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Banner from '../components/Banner.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+---
+
+<BaseLayout title="Consultation" description="Book an Ayurvedic consultation in English or Japanese, in-person in Osaka or online.">
+  <Banner
+    title="Ayurvedic"
+    titleEm="Consultation"
+    subtitle="In-person Osaka · Online · English & Japanese"
+  />
+
+  <section class="bg-cream">
+    <SectionHeader title="Ayurvedic Consultation" jp="相談・カウンセリング" />
+    <div class="consult-layout">
+      <div class="consult-info">
+        <h3>Know Your Constitution</h3>
+        <p>
+          An Ayurvedic consultation begins with understanding your unique nature — your
+          <em>Prakriti</em> (birth constitution) and <em>Vikriti</em> (current imbalance).
+          Through pulse reading, observation, and in-depth conversation, we offer personalised
+          guidance on diet, lifestyle, herbs, and self-care rituals.
+        </p>
+        <p>
+          Consultations are available in English and Japanese, in-person in Osaka or via
+          online video call.
+        </p>
+        <ul class="info-list">
+          <li><span class="label">Duration</span> 60–90 minutes (initial)</li>
+          <li><span class="label">Format</span> In-person (Osaka) or Online</li>
+          <li><span class="label">Languages</span> English · Japanese</li>
+          <li><span class="label">Follow-up</span> 30-minute sessions available</li>
+          <li><span class="label">Includes</span> Written recommendations &amp; herb guide</li>
+        </ul>
+      </div>
+
+      <div class="form-card" id="book-form">
+        <h3>Book a Consultation</h3>
+        <div class="form-grid">
+          <div class="form-row">
+            <label>First Name <span class="required">*</span></label>
+            <input type="text" placeholder="Your first name" id="fname" />
+          </div>
+          <div class="form-row">
+            <label>Last Name <span class="required">*</span></label>
+            <input type="text" placeholder="Your last name" id="lname" />
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Email Address <span class="required">*</span></label>
+          <input type="email" placeholder="your@email.com" id="cemail" />
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label>Consultation Type</label>
+            <select id="ctype">
+              <option>Initial Consultation (90 min)</option>
+              <option>Follow-up (30 min)</option>
+              <option>Online Consultation</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Preferred Language</label>
+            <select>
+              <option>English</option>
+              <option>Japanese / 日本語</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Preferred Date / Time</label>
+          <input type="text" placeholder="e.g. Weekday mornings, April 2025" />
+        </div>
+        <div class="form-row">
+          <label>Brief health concern or question</label>
+          <textarea placeholder="Please share what brings you to Ayurveda..." style="min-height:75px;"></textarea>
+        </div>
+        <div class="form-submit-row">
+          <button class="btn btn-gold" id="book-btn">Request Booking</button>
+        </div>
+        <div class="success-msg" id="book-success">
+          Thank you! We will contact you within 2 business days to confirm your appointment.
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .consult-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 40px;
+    align-items: start;
+  }
+  .consult-info h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--green-deep);
+    margin-bottom: 14px;
+    font-weight: 400;
+  }
+  .consult-info p { font-size: 15.5px; color: var(--text-light); margin-bottom: 14px; line-height: 1.7; }
+  .info-list { list-style: none; margin: 16px 0; }
+  .info-list li {
+    font-size: 15px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    color: var(--text);
+  }
+  .info-list li .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-light);
+    min-width: 90px;
+    padding-top: 2px;
+  }
+  @media (max-width: 820px) {
+    .consult-layout { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  document.getElementById('book-btn')?.addEventListener('click', () => {
+    const fname = (document.getElementById('fname') as HTMLInputElement)?.value.trim();
+    const email = (document.getElementById('cemail') as HTMLInputElement)?.value.trim();
+    if (!fname || !email) { alert('Please fill in your name and email address.'); return; }
+    const success = document.getElementById('book-success');
+    const btn = document.getElementById('book-btn') as HTMLButtonElement;
+    if (success) success.style.display = 'block';
+    if (btn) { btn.disabled = true; btn.textContent = 'Request Sent ✓'; btn.style.background = '#4a7c5e'; }
+  });
+</script>
