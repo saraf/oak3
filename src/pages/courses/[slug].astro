@@ -1,0 +1,344 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Banner from '../../components/Banner.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const courses = await getCollection('courses');
+  return courses.map(course => ({
+    params: { slug: course.slug },
+    props:  { course },
+  }));
+}
+
+const { course } = Astro.props;
+const { Content } = await course.render();
+const c = course.data;
+
+const statusText = {
+  open:    'Enrolment Open',
+  full:    'Currently Full',
+  enquire: 'Enquire for Dates',
+}[c.status];
+
+const statusClass = {
+  open:    'open',
+  full:    'full',
+  enquire: 'soon',
+}[c.status];
+---
+
+<BaseLayout title={c.title} description={c.subtitle ?? c.title}>
+  <Banner
+    title={c.title}
+    subtitle={c.subtitle ?? c.schedule}
+  />
+
+  <article class="course-detail">
+
+    <!-- META BAR -->
+    <div class="meta-bar">
+      <span class={`status ${statusClass}`}>{statusText}</span>
+      <span>📅 {c.schedule}</span>
+      <span>⏱ {c.duration}</span>
+      <span>📍 {c.location}</span>
+    </div>
+
+    <div class="course-layout">
+
+      <!-- MAIN BODY -->
+      <div class="course-body">
+
+        <!-- IMAGES -->
+        {c.images && c.images.length > 0 && (
+          <div class="course-images">
+            {c.images.map(img => (
+              <img src={img} alt="Course image" class="course-img" />
+            ))}
+          </div>
+        )}
+
+        <!-- PDF DOWNLOADS -->
+        {c.pdfs && c.pdfs.length > 0 && (
+          <div class="pdf-downloads">
+            <h4>Downloads</h4>
+            {c.pdfs.map(pdf => (
+              <a href={pdf.file} class="pdf-link" download>
+                <span class="pdf-icon">📄</span>
+                {pdf.label}
+              </a>
+            ))}
+          </div>
+        )}
+
+        <!-- SYLLABUS -->
+        {c.syllabus && c.syllabus.length > 0 && (
+          <div class="syllabus-block">
+            <h2>Syllabus</h2>
+            <ol>
+              {c.syllabus.map(topic => <li>{topic}</li>)}
+            </ol>
+          </div>
+        )}
+
+        <!-- RICH MARKDOWN BODY -->
+        <div class="course-content">
+          <Content />
+        </div>
+
+      </div>
+
+      <!-- SIDEBAR -->
+      <aside class="course-sidebar">
+
+        {c.fee && (
+          <div class="info-card">
+            <h3>Fee</h3>
+            <p>{c.fee}</p>
+          </div>
+        )}
+
+        {c.venue && (
+          <div class="info-card">
+            <h3>Venue</h3>
+            <p class="venue-name">{c.venue.name}</p>
+            {c.venue.address && <p class="venue-address">{c.venue.address}</p>}
+            {c.venue.access  && <p class="venue-access">🚇 {c.venue.access}</p>}
+          </div>
+        )}
+
+        {c.certificate && (
+          <div class="info-card">
+            <h3>Certificate</h3>
+            <p>{c.certificate}</p>
+          </div>
+        )}
+
+        {c.lecturers && c.lecturers.length > 0 && (
+          <div class="info-card">
+            <h3>{c.lecturers.length === 1 ? 'Lecturer' : 'Lecturers'}</h3>
+            {c.lecturers.map(l => (
+              <div class="speaker">
+                <strong class="speaker-name">{l.name}</strong>
+                {l.credentials && <p class="speaker-title">{l.credentials}</p>}
+                {l.bio         && <p class="speaker-bio">{l.bio}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <!-- ENROL CTA -->
+        <div class="info-card register-card">
+          <h3>Enrol</h3>
+          <a href="/contact" class="btn btn-gold register-btn">
+            Enquire / Enrol →
+          </a>
+          <a href="/courses" class="back-link">← All courses</a>
+        </div>
+
+      </aside>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .course-detail { padding: 0; }
+
+  /* ── META BAR ── */
+  .meta-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    padding: 16px 40px;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-light);
+  }
+  .meta-bar .status {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ── TWO-COLUMN LAYOUT ── */
+  .course-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    align-items: start;
+  }
+
+  /* ── MAIN BODY ── */
+  .course-body {
+    padding: 44px 40px;
+    border-right: 1px solid var(--border);
+  }
+
+  /* IMAGES */
+  .course-images { margin-bottom: 28px; }
+  .course-img {
+    max-width: 100%;
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  /* PDF DOWNLOADS */
+  .pdf-downloads {
+    margin-bottom: 28px;
+    padding: 16px 20px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+  }
+  .pdf-downloads h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-light);
+    margin-bottom: 10px;
+  }
+  .pdf-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    color: var(--green-mid);
+    text-decoration: none;
+    font-size: 15px;
+    border-bottom: 1px dashed var(--border);
+    transition: color 0.2s;
+  }
+  .pdf-link:last-child { border-bottom: none; }
+  .pdf-link:hover { color: var(--green-deep); }
+  .pdf-icon { font-size: 18px; }
+
+  /* SYLLABUS */
+  .syllabus-block {
+    margin-bottom: 36px;
+    padding: 24px 28px;
+    background: var(--cream);
+    border-left: 3px solid var(--gold);
+  }
+  .syllabus-block h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--green-deep);
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+  .syllabus-block ol {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .syllabus-block li {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* RICH CONTENT */
+  .course-content {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--text);
+  }
+  .course-content h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--green-deep);
+    margin: 36px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .course-content h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--green-mid);
+    margin: 24px 0 8px;
+  }
+  .course-content p { margin-bottom: 14px; }
+  .course-content ul,
+  .course-content ol { margin: 10px 0 18px 24px; }
+  .course-content li { margin-bottom: 5px; }
+  .course-content strong { font-weight: 600; }
+  .course-content em { font-style: italic; color: var(--green-mid); }
+
+  /* ── SIDEBAR ── */
+  .course-sidebar {
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+  }
+
+  .info-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+  }
+  .info-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-light);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-card p {
+    font-size: 14.5px;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 6px;
+  }
+  .venue-name { font-weight: 600; color: var(--green-deep); }
+  .venue-address { color: var(--text-light); font-size: 13.5px; }
+  .venue-access { color: var(--text-light); font-size: 13px; margin-top: 8px; line-height: 1.5; }
+
+  .speaker {
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .speaker:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .speaker-name { font-size: 15px; color: var(--green-deep); display: block; margin-bottom: 3px; }
+  .speaker-title { font-size: 12.5px; color: var(--gold); margin-bottom: 6px; }
+  .speaker-bio { font-size: 13px; color: var(--text-light); line-height: 1.6; }
+
+  .register-card { background: var(--green-deep); border-color: var(--green-deep); }
+  .register-card h3 { color: var(--gold-light); border-bottom-color: rgba(196,150,58,0.3); }
+  .register-btn {
+    display: block;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  .back-link {
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--gold-light); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 820px) {
+    .meta-bar { padding: 14px 20px; }
+    .course-layout { grid-template-columns: 1fr; }
+    .course-body { padding: 28px 20px; border-right: none; }
+    .course-sidebar { padding: 0 20px 28px; position: static; }
+  }
+</style>

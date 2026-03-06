@@ -1,7 +1,7 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Banner from '../components/Banner.astro';
-import SectionHeader from '../components/SectionHeader.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Banner from '../../components/Banner.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
 import { getCollection } from 'astro:content';
 
 const seminars = await getCollection('seminars');
@@ -30,22 +30,33 @@ const seminars = await getCollection('seminars');
         {seminars.map(s => (
           <tr>
             <td>{s.data.date}</td>
-            <td>{s.data.title}</td>
+            <td>
+              <a href={`/seminars/${s.slug}`}>{s.data.title}</a>
+            </td>
             <td>{s.data.format}</td>
-            <td>{s.data.capacity}</td>
+            <td>{s.data.capacity ?? '—'}</td>
             <td><span class={`status ${s.data.status}`}>{s.data.status}</span></td>
           </tr>
         ))}
       </tbody>
     </table>
     <p class="register-note">
-      To register for a seminar, please use the <a href="/contact">contact form</a> or send
-      an email. We will confirm your place within 2 business days.
+      Click any seminar title for full details, programme, and registration.
+      Or <a href="/contact">contact us</a> directly — we respond within 2 business days.
     </p>
   </section>
 </BaseLayout>
 
 <style>
+  .seminar-table td a {
+    color: var(--green-mid);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .seminar-table td a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
   .register-note {
     margin-top: 20px;
     font-size: 14.5px;

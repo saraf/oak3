@@ -53,10 +53,105 @@ collections:
     folder: src/content/seminars
     create: true
     slug: "{{slug}}"
-    extension: json
+    extension: md
+    format: frontmatter
     fields:
-      - { label: Date,     name: date,     widget: string, hint: "e.g. Apr 12, 2025" }
       - { label: Title,    name: title,    widget: string }
-      - { label: Format,   name: format,   widget: string, hint: "e.g. In-person · Osaka  or  Online" }
-      - { label: Capacity, name: capacity, widget: string, hint: "e.g. 12 seats" }
+      - { label: Date,     name: date,     widget: string, hint: "e.g. April 12, 2025  9:30–16:30" }
       - { label: Status,   name: status,   widget: select, options: [open, soon, full] }
+      - { label: Format,   name: format,   widget: string, hint: "e.g. In-person · Osaka  or  Online (Zoom)" }
+      - { label: Capacity, name: capacity, widget: string, required: false, hint: "e.g. 12 seats" }
+      - { label: Registration Deadline, name: deadline, widget: string, required: false, hint: "e.g. April 5, 2025" }
+      - { label: Fee,      name: fee,      widget: string, required: false, hint: "e.g. Members ¥3,000 · Non-members ¥4,000" }
+
+      - label: Venue
+        name: venue
+        widget: object
+        required: false
+        fields:
+          - { label: Venue Name,        name: name,    widget: string }
+          - { label: Address,           name: address, widget: string, required: false }
+          - { label: Transport / Access, name: access, widget: string, required: false,
+              hint: "e.g. 3 min walk from Tenjinbashisuji-rokuchome Station" }
+
+      - label: Speakers
+        name: speakers
+        widget: list
+        required: false
+        fields:
+          - { label: Name,       name: name,  widget: string }
+          - { label: Title/Role, name: title, widget: string, required: false }
+          - { label: Biography,  name: bio,   widget: text,   required: false }
+
+      - label: Flyer Images
+        name: images
+        widget: list
+        required: false
+        field: { label: Image, name: image, widget: image }
+
+      - label: PDF Downloads
+        name: pdfs
+        widget: list
+        required: false
+        fields:
+          - { label: Label, name: label, widget: string, hint: "e.g. Spring Detox 2025 Flyer" }
+          - { label: File,  name: file,  widget: file }
+
+      - { label: Body, name: body, widget: markdown }
+
+ # ── COURSES ────────────────────────────────────────────────────────────────
+  - name: courses
+    label: Courses
+    folder: src/content/courses
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title,    name: title,    widget: string }
+      - { label: Subtitle, name: subtitle, widget: string, required: false }
+      - { label: Category, name: category, widget: select,
+          options: [regular, specialist, oneday] }
+      - { label: Schedule, name: schedule, widget: string,
+          hint: "e.g. Monthly start · 6 sessions per term" }
+      - { label: Duration, name: duration, widget: string,
+          hint: "e.g. 6 sessions · 90 min lecture + 40 min practical" }
+      - { label: Location, name: location, widget: string }
+      - { label: Status,   name: status,   widget: select,
+          options: [open, full, enquire] }
+      - { label: Fee,         name: fee,         widget: string, required: false }
+      - { label: Certificate, name: certificate, widget: string, required: false }
+      - label: Lecturers
+        name: lecturers
+        widget: list
+        required: false
+        fields:
+          - { label: Name,        name: name,        widget: string }
+          - { label: Credentials, name: credentials, widget: string, required: false }
+          - { label: Biography,   name: bio,         widget: text,   required: false }
+      - label: Venue
+        name: venue
+        widget: object
+        required: false
+        fields:
+          - { label: Venue Name, name: name,    widget: string }
+          - { label: Address,    name: address, widget: string, required: false }
+          - { label: Access,     name: access,  widget: string, required: false }
+      - label: Syllabus
+        name: syllabus
+        widget: list
+        required: false
+        field: { label: Topic, name: topic, widget: string }
+      - label: Images
+        name: images
+        widget: list
+        required: false
+        field: { label: Image, name: image, widget: image }
+      - label: PDF Downloads
+        name: pdfs
+        widget: list
+        required: false
+        fields:
+          - { label: Label, name: label, widget: string }
+          - { label: File,  name: file,  widget: file }
+      - { label: Body, name: body, widget: markdown }

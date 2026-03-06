@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Banner from '../../components/Banner.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import CourseCard from '../../components/CourseCard.astro';
+import { getCollection } from 'astro:content';
+
+const allCourses = await getCollection('courses');
+
+const regular    = allCourses.filter(c => c.data.category === 'regular');
+const specialist = allCourses.filter(c => c.data.category === 'specialist');
+const oneday     = allCourses.filter(c => c.data.category === 'oneday');
+---
+
+<BaseLayout
+  title="Courses & Lectures"
+  description="Ayurveda courses in Osaka — regular term courses, specialist herbalism, and one-day workshops."
+>
+  <Banner
+    title="Courses &"
+    titleEm="Lectures"
+    subtitle="Regular · Specialist · One-Day Workshops"
+  />
+
+  {regular.length > 0 && (
+    <section class="bg-white">
+      <SectionHeader title="Regular Courses" jp="定期コース" />
+      <div class="courses-grid">
+        {regular.map(course => <CourseCard course={course} />)}
+      </div>
+    </section>
+  )}
+
+  {specialist.length > 0 && (
+    <section class="bg-cream">
+      <SectionHeader title="Specialist Courses" jp="専門コース" />
+      <div class="courses-grid">
+        {specialist.map(course => <CourseCard course={course} />)}
+      </div>
+    </section>
+  )}
+
+  {oneday.length > 0 && (
+    <section class="bg-white">
+      <SectionHeader title="One-Day Workshops" jp="1日集中コース" />
+      <div class="courses-grid">
+        {oneday.map(course => <CourseCard course={course} />)}
+      </div>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 820px) {
+    .courses-grid { grid-template-columns: 1fr; }
+  }
+</style>
