@@ -1,0 +1,496 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Banner from '../../components/Banner.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('gallery');
+  return entries.map(entry => ({
+    params: { slug: entry.slug },
+    props:  { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const e = entry.data;
+
+const categoryLabel: Record<string, string> = {
+  seminar:  'Seminar',
+  india:    'India Tour',
+  workshop: 'Workshop',
+  cultural: 'Cultural',
+};
+
+const formattedDate = new Date(e.date).toLocaleDateString('en-GB', {
+  year: 'numeric', month: 'long', day: 'numeric'
+});
+
+const relatedPath = e.relatedType && e.relatedSlug
+  ? `/${e.relatedType}s/${e.relatedSlug}`
+  : null;
+---
+
+<BaseLayout title={e.title} description={e.description}>
+  <Banner title={e.title} subtitle={`${formattedDate} · ${categoryLabel[e.category]}`} />
+
+  <article class="gallery-detail">
+
+    <!-- META BAR -->
+    <div class="meta-bar">
+      <span class={`category-badge cat-${e.category}`}>{categoryLabel[e.category]}</span>
+      <span>📅 {formattedDate}</span>
+      <span>📷 {e.images.length} photo{e.images.length !== 1 ? 's' : ''}</span>
+      {relatedPath && (
+        <a href={relatedPath} class="related-link">
+          → {e.relatedLabel ?? 'View related page'}
+        </a>
+      )}
+    </div>
+
+    <div class="detail-layout">
+
+      <!-- MAIN: PHOTO GRID -->
+      <div class="detail-body">
+
+        {e.description && (
+          <p class="event-description">{e.description}</p>
+        )}
+
+        <!-- PHOTO GRID -->
+        <div class="photo-grid" id="photoGrid">
+          {e.images.map((img, i) => (
+            <figure
+              class="photo-item"
+              data-index={i}
+              data-src={img.file}
+              data-caption={img.caption ?? ''}
+              data-alt={img.alt ?? img.caption ?? e.title}
+            >
+              <div class="photo-wrap">
+                <img
+                  src={img.file}
+                  alt={img.alt ?? img.caption ?? e.title}
+                  loading="lazy"
+                />
+                <div class="photo-hover">
+                  <span class="zoom-icon">⊕</span>
+                </div>
+              </div>
+              {img.caption && (
+                <figcaption>{img.caption}</figcaption>
+              )}
+            </figure>
+          ))}
+        </div>
+
+        <!-- RICH MARKDOWN BODY -->
+        {entry.body.trim() && (
+          <div class="event-body">
+            <Content />
+          </div>
+        )}
+
+      </div>
+
+      <!-- SIDEBAR -->
+      <aside class="detail-sidebar">
+
+        <div class="info-card">
+          <h3>Event</h3>
+          <p class="info-value">{e.title}</p>
+          <p class="info-meta">{formattedDate}</p>
+        </div>
+
+        {relatedPath && (
+          <div class="info-card related-card">
+            <h3>{e.relatedType === 'seminar' ? 'Related Seminar' : 'Related Course'}</h3>
+            <p class="related-label">{e.relatedLabel}</p>
+            <a href={relatedPath} class="btn btn-primary related-btn">
+              View Details →
+            </a>
+          </div>
+        )}
+
+        <div class="info-card">
+          <h3>All Photos</h3>
+          <div class="thumbnail-strip">
+            {e.images.map((img, i) => (
+              <img
+                src={img.file}
+                alt={img.alt ?? `Photo ${i + 1}`}
+                class="thumb"
+                data-index={i}
+                loading="lazy"
+              />
+            ))}
+          </div>
+        </div>
+
+        <a href="/gallery" class="back-link-outer">← All photo reports</a>
+
+      </aside>
+    </div>
+  </article>
+
+  <!-- ── LIGHTBOX ── -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button class="lb-close" id="lbClose" aria-label="Close">✕</button>
+    <button class="lb-prev"  id="lbPrev"  aria-label="Previous photo">‹</button>
+    <button class="lb-next"  id="lbNext"  aria-label="Next photo">›</button>
+    <div class="lb-content">
+      <img src="" alt="" id="lbImg" />
+      <p class="lb-caption" id="lbCaption"></p>
+      <p class="lb-counter" id="lbCounter"></p>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // ── DATA ──────────────────────────────────────────────────────────────────
+  const items = Array.from(
+    document.querySelectorAll<HTMLElement>('#photoGrid .photo-item')
+  ).map(el => ({
+    src:     el.dataset.src!,
+    caption: el.dataset.caption ?? '',
+    alt:     el.dataset.alt ?? '',
+  }));
+
+  let current = 0;
+
+  // ── ELEMENTS ──────────────────────────────────────────────────────────────
+  const lightbox  = document.getElementById('lightbox')!;
+  const lbImg     = document.getElementById('lbImg') as HTMLImageElement;
+  const lbCaption = document.getElementById('lbCaption')!;
+  const lbCounter = document.getElementById('lbCounter')!;
+  const lbClose   = document.getElementById('lbClose')!;
+  const lbPrev    = document.getElementById('lbPrev')!;
+  const lbNext    = document.getElementById('lbNext')!;
+
+  // ── HELPERS ───────────────────────────────────────────────────────────────
+  function show(index: number) {
+    current = (index + items.length) % items.length;
+    const item = items[current];
+    lbImg.src            = item.src;
+    lbImg.alt            = item.alt;
+    lbCaption.textContent = item.caption;
+    lbCounter.textContent = `${current + 1} / ${items.length}`;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function close() {
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // ── OPEN ON GRID CLICK ────────────────────────────────────────────────────
+  document.querySelectorAll<HTMLElement>('#photoGrid .photo-item').forEach(el => {
+    el.addEventListener('click', () => show(Number(el.dataset.index)));
+    el.style.cursor = 'pointer';
+  });
+
+  // ── OPEN ON THUMBNAIL CLICK ───────────────────────────────────────────────
+  document.querySelectorAll<HTMLElement>('.thumb').forEach(el => {
+    el.addEventListener('click', () => show(Number(el.dataset.index)));
+    el.style.cursor = 'pointer';
+  });
+
+  // ── CONTROLS ──────────────────────────────────────────────────────────────
+  lbClose.addEventListener('click', close);
+  lbPrev.addEventListener('click',  () => show(current - 1));
+  lbNext.addEventListener('click',  () => show(current + 1));
+
+  // Close on backdrop click
+  lightbox.addEventListener('click', e => {
+    if (e.target === lightbox) close();
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (!lightbox.classList.contains('active')) return;
+    if (e.key === 'ArrowRight') show(current + 1);
+    if (e.key === 'ArrowLeft')  show(current - 1);
+    if (e.key === 'Escape')     close();
+  });
+</script>
+
+<style>
+  .gallery-detail { padding: 0; }
+
+  /* ── META BAR ── */
+  .meta-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    padding: 16px 40px;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-light);
+  }
+  .category-badge {
+    padding: 3px 10px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'Crimson Pro', serif;
+  }
+  .cat-seminar  { background: var(--green-deep); color: var(--gold-light); }
+  .cat-india    { background: #8b4513; color: #fdf0e0; }
+  .cat-workshop { background: #2c5f6e; color: #e8f4f8; }
+  .cat-cultural { background: #5c3566; color: #f5e8f8; }
+  .related-link {
+    margin-left: auto;
+    color: var(--green-mid);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-style: italic;
+    transition: color 0.2s;
+  }
+  .related-link:hover { color: var(--green-deep); }
+
+  /* ── LAYOUT ── */
+  .detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    align-items: start;
+  }
+  .detail-body {
+    padding: 40px 40px;
+    border-right: 1px solid var(--border);
+  }
+
+  .event-description {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--text-light);
+    font-style: italic;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── PHOTO GRID ── */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .photo-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .photo-wrap {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--cream);
+  }
+  .photo-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+    display: block;
+  }
+  .photo-item:hover .photo-wrap img {
+    transform: scale(1.05);
+  }
+  .photo-hover {
+    position: absolute;
+    inset: 0;
+    background: rgba(28,53,38,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .photo-item:hover .photo-hover { opacity: 1; }
+  .zoom-icon {
+    color: white;
+    font-size: 28px;
+    line-height: 1;
+  }
+  figcaption {
+    font-size: 12.5px;
+    color: var(--text-light);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* ── MARKDOWN BODY ── */
+  .event-body {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--text);
+    border-top: 1px solid var(--border);
+    padding-top: 32px;
+  }
+  .event-body p { margin-bottom: 14px; }
+  .event-body h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--green-deep);
+    margin: 28px 0 12px;
+    font-weight: 500;
+  }
+  .event-body strong { font-weight: 600; }
+  .event-body em { font-style: italic; color: var(--green-mid); }
+
+  /* ── SIDEBAR ── */
+  .detail-sidebar {
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+  }
+  .info-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+  }
+  .info-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-light);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-value { font-size: 15px; font-weight: 500; color: var(--green-deep); }
+  .info-meta  { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+
+  .related-card { border-color: var(--green-mid); }
+  .related-label {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .related-btn { display: block; text-align: center; }
+
+  /* THUMBNAIL STRIP */
+  .thumbnail-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .thumb {
+    aspect-ratio: 1;
+    width: 100%;
+    object-fit: cover;
+    opacity: 0.75;
+    transition: opacity 0.2s;
+  }
+  .thumb:hover { opacity: 1; }
+
+  .back-link-outer {
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-light);
+    text-decoration: none;
+    padding: 10px;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+  .back-link-outer:hover {
+    border-color: var(--green-mid);
+    color: var(--green-mid);
+  }
+
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 18, 12, 0.94);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .lightbox.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .lb-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 90vw;
+    max-height: 90vh;
+    gap: 14px;
+  }
+  .lb-content img {
+    max-width: 85vw;
+    max-height: 78vh;
+    object-fit: contain;
+    display: block;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+  }
+  .lb-caption {
+    color: rgba(255,255,255,0.8);
+    font-size: 15px;
+    font-style: italic;
+    text-align: center;
+    max-width: 600px;
+    line-height: 1.5;
+  }
+  .lb-counter {
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-family: 'Crimson Pro', serif;
+  }
+
+  /* Lightbox buttons */
+  .lb-close,
+  .lb-prev,
+  .lb-next {
+    position: fixed;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+  .lb-close,
+  .lb-prev,
+  .lb-next { color: rgba(255,255,255,0.7); }
+  .lb-close:hover,
+  .lb-prev:hover,
+  .lb-next:hover { color: var(--gold-light); }
+
+  .lb-close { top: 24px; right: 32px; font-size: 28px; }
+  .lb-prev  { left: 24px; top: 50%; transform: translateY(-50%); font-size: 56px; }
+  .lb-next  { right: 24px; top: 50%; transform: translateY(-50%); font-size: 56px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 820px) {
+    .meta-bar    { padding: 14px 20px; }
+    .detail-layout { grid-template-columns: 1fr; }
+    .detail-body { padding: 24px 20px; border-right: none; }
+    .detail-sidebar { padding: 0 20px 28px; position: static; }
+    .photo-grid  { grid-template-columns: repeat(2, 1fr); }
+    .related-link { display: none; }
+  }
+  @media (max-width: 480px) {
+    .photo-grid { grid-template-columns: 1fr; }
+    .lb-prev { left: 8px; }
+    .lb-next { right: 8px; }
+  }
+</style>

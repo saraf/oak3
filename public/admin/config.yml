@@ -155,3 +155,46 @@ collections:
           - { label: Label, name: label, widget: string }
           - { label: File,  name: file,  widget: file }
       - { label: Body, name: body, widget: markdown }
+
+  # ── GALLERY ────────────────────────────────────────────────────────────────
+  - name: gallery
+    label: Photo Gallery
+    folder: src/content/gallery
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: Title,       name: title,       widget: string }
+      - { label: Date,        name: date,        widget: datetime, format: "YYYY-MM-DD",
+          hint: "Date of the event" }
+      - { label: Category,    name: category,    widget: select,
+          options: [seminar, india, workshop, cultural] }
+      - { label: Description, name: description, widget: text,
+          hint: "1–2 sentence summary shown on the gallery index card." }
+      - { label: Cover Image, name: coverImage,  widget: image, required: false,
+          hint: "The image shown on the gallery index. If blank, the first photo is used." }
+
+      - label: "Related Page (optional)"
+        name: relatedType
+        widget: select
+        required: false
+        options: [seminar, course]
+        hint: "Is this event linked to a seminar or course page?"
+      - { label: Related Slug, name: relatedSlug, widget: string, required: false,
+          hint: "The slug of the related seminar or course e.g. spring-detox or ayurveda-talk" }
+      - { label: Related Link Label, name: relatedLabel, widget: string, required: false,
+          hint: "e.g. Spring Detox & Kapha Cleanse — view seminar details" }
+
+      - label: Photos
+        name: images
+        widget: list
+        fields:
+          - { label: Photo,   name: file,    widget: image }
+          - { label: Caption, name: caption, widget: string,   required: false,
+              hint: "Short English description of what is happening in the photo." }
+          - { label: Alt Text, name: alt,    widget: string,   required: false,
+              hint: "Accessibility description. If blank, caption is used." }
+
+      - { label: "Event notes (optional)", name: body, widget: markdown, required: false,
+          hint: "Optional longer description shown below the photo grid." }

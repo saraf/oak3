@@ -81,4 +81,23 @@ const courses = defineCollection({
   }),
 });
 
-export const collections = { articles, news, seminars, courses };
+const gallery = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title:       z.string(),
+    date:        z.string(),                              // ISO: "2025-04-12"
+    category:    z.enum(['seminar', 'india', 'workshop', 'cultural']),
+    description: z.string(),                              // short summary (~1–2 sentences)
+    coverImage:  z.string().optional(),                   // path to cover photo
+    relatedType: z.enum(['seminar', 'course']).optional(),// what the related link points to
+    relatedSlug: z.string().optional(),                   // slug of the related seminar/course
+    relatedLabel: z.string().optional(),                  // link label e.g. "Spring Detox Seminar"
+    images: z.array(z.object({
+      file:    z.string(),                                // path e.g. /images/gallery/event/01.jpg
+      caption: z.string().optional(),                     // English caption
+      alt:     z.string().optional(),                     // accessibility alt text
+    })),
+  }),
+});
+
+export const collections = { articles, news, seminars, courses, gallery };
