@@ -86,7 +86,7 @@ const gallery = defineCollection({
   schema: z.object({
     title:       z.string(),
     date:        z.string(),                              // ISO: "2025-04-12"
-    category:    z.enum(['seminar', 'india', 'workshop', 'cultural']),
+    category:    z.enum(['seminar', 'india', 'workshop', 'cultural', 'publications']),
     description: z.string(),                              // short summary (~1–2 sentences)
     coverImage:  z.string().optional(),                   // path to cover photo
     relatedType: z.enum(['seminar', 'course']).optional(),// what the related link points to

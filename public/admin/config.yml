@@ -169,7 +169,7 @@ collections:
       - { label: Date,        name: date,        widget: datetime, format: "YYYY-MM-DD",
           hint: "Date of the event" }
       - { label: Category,    name: category,    widget: select,
-          options: [seminar, india, workshop, cultural] }
+          options: [seminar, india, workshop, cultural, publications] }
       - { label: Description, name: description, widget: text,
           hint: "1–2 sentence summary shown on the gallery index card." }
       - { label: Cover Image, name: coverImage,  widget: image, required: false,
