@@ -6,9 +6,9 @@ import { getCollection } from 'astro:content';
 
 const allEntries = await getCollection('gallery');
 
-// Sort newest first
+// Sort by date_added, newest first
 const entries = allEntries.sort((a, b) =>
-  new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+  new Date(b.data.date_added).getTime() - new Date(a.data.date_added).getTime()
 );
 
 const categoryLabel: Record<string, string> = {
@@ -64,7 +64,7 @@ const categoryLabel: Record<string, string> = {
               </span>
             </div>
             <div class="card-body">
-              <p class="card-date">{new Date(e.date).toLocaleDateString('en-GB', { year: 'numeric', month: 'long' })}</p>
+              <p class="card-date">{new Date(e.date ?? e.date_added).toLocaleDateString('en-GB', { year: 'numeric', month: 'long' })}</p>
               <h3 class="card-title">{e.title}</h3>
               <p class="card-desc">{e.description}</p>
             </div>

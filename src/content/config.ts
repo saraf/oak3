@@ -85,7 +85,8 @@ const gallery = defineCollection({
   type: 'content',
   schema: z.object({
     title:       z.string(),
-    date:        z.string(),                              // ISO: "2025-04-12"
+    date_added:   z.string(),                               // ISO "2025-04-12" — controls gallery sort order
+    date:         z.string().optional(),                    // Event date — omit for publications
     category:    z.enum(['seminar', 'india', 'workshop', 'cultural', 'publications']),
     description: z.string(),                              // short summary (~1–2 sentences)
     coverImage:  z.string().optional(),                   // path to cover photo
@@ -96,6 +97,8 @@ const gallery = defineCollection({
       file:    z.string(),                                // path e.g. /images/gallery/event/01.jpg
       caption: z.string().optional(),                     // English caption
       alt:     z.string().optional(),                     // accessibility alt text
+      date_added: z.string(),                               // ISO "2025-04-12" — controls photo sort order within entry
+      date_taken: z.string().optional(),                    // "2019-03-14" or "2019-03" or "2019"
     })),
   }),
 });

@@ -166,8 +166,11 @@ collections:
     format: frontmatter
     fields:
       - { label: Title,       name: title,       widget: string }
-      - { label: Date,        name: date,        widget: datetime, format: "YYYY-MM-DD",
-          hint: "Date of the event" }
+      - { label: Date Added,  name: date_added,  widget: datetime, format: "YYYY-MM-DD",
+          hint: "Controls the sort order on the gallery index — set to today when adding a new entry." }
+      - { label: Event Date,  name: date,        widget: datetime, format: "YYYY-MM-DD",
+          required: false,
+          hint: "The date of the event. Leave blank for publications, book covers, etc." }
       - { label: Category,    name: category,    widget: select,
           options: [seminar, india, workshop, cultural, publications] }
       - { label: Description, name: description, widget: text,
@@ -180,7 +183,7 @@ collections:
         widget: select
         required: false
         options: [seminar, course]
-        hint: "Is this event linked to a seminar or course page?"
+        hint: "Is this entry linked to a seminar or course page?"
       - { label: Related Slug, name: relatedSlug, widget: string, required: false,
           hint: "The slug of the related seminar or course e.g. spring-detox or ayurveda-talk" }
       - { label: Related Link Label, name: relatedLabel, widget: string, required: false,
@@ -195,6 +198,10 @@ collections:
               hint: "Short English description of what is happening in the photo." }
           - { label: Alt Text, name: alt,    widget: string,   required: false,
               hint: "Accessibility description. If blank, caption is used." }
+          - { label: Date Added, name: date_added, widget: datetime, format: "YYYY-MM-DD",
+              hint: "Today's date — used to sort photos within this entry, most recently added first." }
+          - { label: Date Taken, name: date_taken, widget: string, required: false,
+              hint: "When the photo was taken e.g. 2019-03-14 or 2019-03 or 2019. Filled automatically by the scraper where possible." }
 
       - { label: "Event notes (optional)", name: body, widget: markdown, required: false,
           hint: "Optional longer description shown below the photo grid." }
