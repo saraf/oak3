@@ -1,4 +1,4 @@
-# e-Ayurveda — English Website
+# Osaka Ayurveda Kenkyusho - Ayurveda — English Website
 
 English-language Ayurveda education and wellness site, built with [Astro](https://astro.build).
 
